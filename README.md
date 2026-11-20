@@ -1,47 +1,44 @@
 # Which claim gets worked next?
 
-[Open the interactive report](https://rhasan55.github.io/claims-review/) | [Python analysis](analysis.py) | [SQL Server feature sketch](warehouse.sql)
+A denial-work review that counts expected recovery, the cost of working a claim, and the evidence behind a proposed correction.
 
-An independent portfolio demonstration by Raja Hasan, built around Red Sky Health's public Senior Data Scientist posting. It asks two questions: how should a limited billing team prioritize denied claims, and when is a proposed correction supported well enough to review?
+[Open the report](https://rhasan55.github.io/claims-review/) · [SQL](panel.sql) · [Analysis](analysis.py)
 
-**All claims, outcomes and policy passages are synthetic.** This is not Red Sky Health's product, data, model, payer guidance or measured performance. There is no clinical recommendation, live claim submission or external model call.
+![Observed recovery for three synthetic claim queues](preview.svg)
 
-## Run
+In this case, selecting by expected recovery works more paid claims within the same review capacity. A large balance alone does not tell a biller how likely it is to be recovered.
 
-Python 3.12:
+All observations and policy passages are simulated. This is not an estimate of Red Sky Health's results. The question came from its public role covering denial prediction, score calibration and auditable LLM recommendations. [Context](sources.md)
 
-```sh
+## What changes the answer
+
+The report compares three queues over the same held-out cohort, with 100 claims reviewed at $20 each:
+
+| Selection rule | Recovery after review cost | Interpretation |
+| --- | ---: | --- |
+| Oldest first | $597.81 | Work the claims that have waited longest. |
+| Largest balance | $24,455.82 | Prioritize the largest allowed amounts. |
+| Expected recovery | $35,049.27 | Account for recovery probability as well as amount. |
+
+Amounts are USD from constructed, fully observed 60-day outcomes. These comparisons demonstrate the accounting; they do not establish causal revenue lift or real-world model accuracy. The evidence panel separately shows why a proposed correction must be held when its policy or source value does not match.
+
+## Reproduce
+
+```bash
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 OMP_NUM_THREADS=1 python analysis.py
 python evidence.py
+python ledger.py
 python -m unittest -v test_analysis.py
 python build_report.py
-python -m http.server 8768
 ```
 
-Open `http://localhost:8768`. The generated report also works as a standalone HTML file. Results are fixed by seed 55. Rerun the Python analysis to change the data, not the displayed controls.
+Python 3.12; dependencies are pinned. Seed 55 reproduces the displayed values. You can open `index.html` directly without installing anything.
 
-## What is implemented
+`panel.sql` runs a point-in-time join over normalized synthetic events, including replayed payments and reversals. `warehouse.sql` gives its SQL Server integration counterpart. The Python analysis trains a gradient-boosted model, fits its calibration map on a separate period, and evaluates only after those labels have matured. `evidence.py` checks structured candidate outputs against payer, plan, policy date and source evidence.
 
-- A gradient-boosted tree estimates 60-day recovery probability for a denial episode. A separate calibration period fits a logistic (Platt) map.
-- Labels mature before the following phase begins. Claims have unique episode identifiers. Outcome and future payment fields are excluded from features.
-- The report compares calibration curves, Brier score and three work-queue policies at the same review capacity.
-- A structured-output validator checks payer, plan, service date, policy availability, exact quotation, evidence IDs, allowed actions and proposed changes.
-- Thirteen deliberately constructed candidate outputs exercise the validator. These are **fixtures, not sampled LLM outputs**. Passing them is not an LLM accuracy, security or HIPAA certification.
-- `warehouse.sql` sketches a point-in-time SQL Server feature join and 60-day payment label. It is documentation for integration, not tested against a real SQL Server warehouse or a full 837/835 parser.
+This is a small local example, not a production claims system. The SQL sketch is not warehouse-tested, and the evidence cases are fixed fixtures, not live LLM outputs. Real use needs biller adjudication, policy retrieval evaluation and a prospective test of recovery.
 
-## How to read the result
-
-The target is recovery observed under an assumed existing workflow. It does not estimate the causal effect of working an extra claim. Queue comparisons reuse a fully observed synthetic outcome for every claim. In real operations, unworked claims have selectively missing outcomes. A prospective randomized or otherwise defensible rollout is needed before claiming revenue lift.
-
-Ranking uses probability times allowed amount minus a fixed $20 review cost. Allowed amount is known at decision time in this constructed dataset. That assumption must be checked locally. Partial payments, reversals, timely-filing limits, action-specific recoverability and time-to-cash need explicit treatment before deployment.
-
-Reason and payer numbers are fictional categories, not CARC/RARC or CPT mappings. Policy retrieval is exact scoped filtering over three fixture documents, not semantic search. The demo implements the contract around an LLM response, not a trained denial-reasoning model. See `llm-contract.md` for the adapter boundary and the next evaluation step.
-
-## First sprint proposal
-
-Start with one denial family and one payer. Reconstruct the claim state available at the original decision, audit payment allocation, create a blinded biller-reviewed test set, and run the model in shadow mode. Measure supported-action rate, abstention, review time, follow-rate, and net recovered revenue on matured cohorts. Investigate errors before expanding automation.
-
-[Sources](sources.md) | [Model and evidence code](analysis.py) | [Evidence contract](evidence.py)
+[Methods](methods.md) · [Checks and development notes](analysis-audit.md) · [Test output](test-results.txt)

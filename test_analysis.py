@@ -83,5 +83,41 @@ class ResultChecks(unittest.TestCase):
             self.assertEqual(evidence.validate(evidence.BASE, x)["status"], "hold")
 
 
+class LedgerChecks(unittest.TestCase):
+    def setUp(self):
+        import ledger
+
+        self.ledger = ledger
+        self.rows = {r["episode_id"]: r for r in ledger.build(*ledger.fixture())}
+
+    def test_snapshot_excludes_future_version(self):
+        self.assertEqual(self.rows["E01"]["version_id"], 1)
+        self.assertEqual(self.rows["E01"]["allowed_cents"], 10000)
+
+    def test_duplicate_payment_and_reversal(self):
+        self.assertEqual(self.rows["E01"]["recovered_cents"], 5000)
+        self.assertEqual(self.rows["E02"]["recovered_cents"], 0)
+        self.assertEqual(self.rows["E02"]["recovered_60d"], 0)
+
+    def test_maturity_and_window(self):
+        self.assertNotIn("E03", self.rows)
+        self.assertEqual(self.rows["E04"]["recovered_cents"], 0)
+        self.assertEqual(self.rows["E05"]["recovered_cents"], 0)
+
+    def test_conflicting_replay_rejected(self):
+        _, _, events = self.ledger.fixture()
+        conflict = events[0].copy()
+        conflict["net_paid_cents"] = 1
+        with self.assertRaises(ValueError):
+            self.ledger.deduplicate(events + [conflict])
+
+    def test_ambiguous_episode_allocation_rejected(self):
+        episodes, versions, events = self.ledger.fixture()
+        with self.assertRaises(ValueError):
+            self.ledger.build(
+                episodes + [("E06", "C01", "2026-02-01")], versions, events
+            )
+
+
 if __name__ == "__main__":
     unittest.main()

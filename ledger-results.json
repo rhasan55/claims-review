@@ -1,0 +1,50 @@
+[
+  {
+    "episode_id": "E01",
+    "claim_id": "C01",
+    "decision_at": "2026-01-10",
+    "version_id": 1,
+    "recorded_at": "2026-01-09",
+    "payer": "A",
+    "allowed_cents": 10000,
+    "reason": "missing_identifier",
+    "recovered_cents": 5000,
+    "recovered_60d": 1
+  },
+  {
+    "episode_id": "E02",
+    "claim_id": "C02",
+    "decision_at": "2026-01-10",
+    "version_id": 1,
+    "recorded_at": "2026-01-09",
+    "payer": "B",
+    "allowed_cents": 20000,
+    "reason": "authorization",
+    "recovered_cents": 0,
+    "recovered_60d": 0
+  },
+  {
+    "episode_id": "E04",
+    "claim_id": "C04",
+    "decision_at": "2026-01-10",
+    "version_id": 1,
+    "recorded_at": "2026-01-09",
+    "payer": "B",
+    "allowed_cents": 10000,
+    "reason": "other",
+    "recovered_cents": 0,
+    "recovered_60d": 0
+  },
+  {
+    "episode_id": "E05",
+    "claim_id": "C05",
+    "decision_at": "2026-01-10",
+    "version_id": 1,
+    "recorded_at": "2026-01-09",
+    "payer": "A",
+    "allowed_cents": 10000,
+    "reason": "other",
+    "recovered_cents": 0,
+    "recovered_60d": 0
+  }
+]
