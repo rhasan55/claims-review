@@ -1,0 +1,18 @@
+test_deterministic (test_analysis.Checks.test_deterministic) ... ok
+test_evidence_contract (test_analysis.Checks.test_evidence_contract) ... ok
+test_maturity (test_analysis.Checks.test_maturity) ... ok
+test_no_cross_payer (test_analysis.Checks.test_no_cross_payer) ... ok
+test_no_duplicate_episodes (test_analysis.Checks.test_no_duplicate_episodes) ... ok
+test_no_label_features (test_analysis.Checks.test_no_label_features) ... ok
+test_output_schema (test_analysis.Checks.test_output_schema) ... ok
+test_policy_availability (test_analysis.Checks.test_policy_availability) ... ok
+test_calibration_bin_denominators (test_analysis.ResultChecks.test_calibration_bin_denominators) ... ok
+test_malformed_output (test_analysis.ResultChecks.test_malformed_output) ... ok
+test_no_duplicate_test_claim (test_analysis.ResultChecks.test_no_duplicate_test_claim) ... ok
+test_period_boundaries (test_analysis.ResultChecks.test_period_boundaries) ... ok
+test_queue_reconciles (test_analysis.ResultChecks.test_queue_reconciles) ... ok
+
+----------------------------------------------------------------------
+Ran 13 tests in 0.467s
+
+OK

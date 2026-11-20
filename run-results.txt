@@ -1,0 +1,50 @@
+{
+  "seed": 55,
+  "synthetic": true,
+  "features": [
+    "reason",
+    "payer",
+    "age_days",
+    "prior_denials",
+    "has_auth",
+    "missing_field",
+    "allowed_amount"
+  ],
+  "split": {
+    "train": 5956,
+    "calibration": 1507,
+    "test": 1551,
+    "train_latest_label": "2025-10-31",
+    "calibration_latest_label": "2026-03-01",
+    "test_first_decision": "2026-03-02"
+  },
+  "queue": {
+    "capacity": 100,
+    "cost": 20,
+    "oldest": {
+      "claims": 100,
+      "realized_recovered": 2597.81,
+      "review_cost": 2000,
+      "net": 597.81,
+      "expected_net": 928.84,
+      "recovered_claims": 15
+    },
+    "largest": {
+      "claims": 100,
+      "realized_recovered": 26455.82,
+      "review_cost": 2000,
+      "net": 24455.82,
+      "expected_net": 26589.82,
+      "recovered_claims": 26
+    },
+    "expected_net": {
+      "claims": 100,
+      "realized_recovered": 37049.27,
+      "review_cost": 2000,
+      "net": 35049.27,
+      "expected_net": 35253.54,
+      "recovered_claims": 51
+    }
+  }
+}
+Brier raw/calibrated: 0.15821351546197293 0.1577968189736973
